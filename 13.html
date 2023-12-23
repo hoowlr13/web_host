@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>간단한 방명록</title>
+</head>
+<body>
+
+<h1>방명록</h1>
+<form id="guestbookForm">
+    <label for="name">이름:</label>
+    <input type="text" id="name" name="name" required>
+    <br>
+    <label for="message">메시지:</label>
+    <textarea id="message" name="message" cols="30" rows="5" required></textarea>
+    <br>
+    <button type="button" onclick="addEntry()">글쓰기</button>
+</form>
+
+<div id="guestbookEntries"></div>
+
+<script>
+    function addEntry() {
+        const nameInput = document.getElementById('name');
+        const messageInput = document.getElementById('message');
+
+        const name = nameInput.value;
+        const message = messageInput.value;
+
+        if (!name || !message) {
+            alert('이름과 메시지를 모두 입력해주세요.');
+            return;
+        }
+
+        // 새로운 방명록 항목 생성
+        const newEntry = document.createElement('div');
+        newEntry.innerHTML = `<strong>${name}:</strong> ${message}`;
+
+        // 방명록 목록에 추가
+        const guestbookEntries = document.getElementById('guestbookEntries');
+        guestbookEntries.appendChild(newEntry);
+
+        // 입력 필드 초기화
+        nameInput.value = '';
+        messageInput.value = '';
+
+        // 로컬 스토리지에 저장
+        saveToLocalStorage(name, message);
+    }
+
+    function saveToLocalStorage(name, message) {
+        // 로컬 스토리지에서 기존 데이터 가져오기
+        const existingEntries = JSON.parse(localStorage.getItem('guestbook')) || [];
+
+        // 새로운 데이터 추가
+        existingEntries.push({ name, message });
+
+        // 로컬 스토리지에 저장
+        localStorage.setItem('guestbook', JSON.stringify(existingEntries));
+    }
+
+    function loadFromLocalStorage() {
+        const existingEntries = JSON.parse(localStorage.getItem('guestbook')) || [];
+
+        const guestbookEntries = document.getElementById('guestbookEntries');
+        guestbookEntries.innerHTML = '';
+
+        existingEntries.forEach(entry => {
+            const newEntry = document.createElement('div');
+            newEntry.innerHTML = `<strong>${entry.name}:</strong> ${entry.message}`;
+            guestbookEntries.appendChild(newEntry);
+        });
+    }
+
+    // 페이지 로드 시 로컬 스토리지에서 데이터 불러오기
+    window.onload = function () {
+        loadFromLocalStorage();
+    };
+</script>
+
+</body>
+</html>
